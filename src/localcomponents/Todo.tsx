@@ -1,35 +1,27 @@
 import { MdDeleteOutline } from 'react-icons/md';
 import { BiSolidEdit } from 'react-icons/bi';
 import { TTodo } from '@/api/api';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import { FaArrowDown } from 'react-icons/fa';
 import { FaArrowUp } from 'react-icons/fa';
+import { TodoDispatchContext } from '@/context';
 
 type TTodoProps = TTodo & {
   index: number;
   todoLength: number;
-  handleToggleIsDone: (id: string) => void;
-  handleDeleteTodo: (id: string) => void;
-  handleUpdateTitle: (id: string, title: string) => void;
-  handleMoveUp: (index: number) => void;
-  handleMoveDown: (index: number) => void;
+  // handleToggleIsDone: (id: string) => void;
+  // handleDeleteTodo: (id: string) => void;
+  // handleUpdateTitle: (id: string, title: string) => void;
+  // handleMoveUp: (index: number) => void;
+  // handleMoveDown: (index: number) => void;
 };
 
-const Todo = ({
-  index,
-  id,
-  isDone,
-  title,
-  todoLength,
-  handleToggleIsDone,
-  handleDeleteTodo,
-  handleUpdateTitle,
-  handleMoveUp,
-  handleMoveDown,
-}: TTodoProps) => {
+const Todo = ({ index, id, isDone, title, todoLength }: TTodoProps) => {
   const [canEditTitle, setCanEditTitle] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
+
+  const dispatch = useContext(TodoDispatchContext);
 
   const toggleEditTitle = () => {
     setCanEditTitle((prev) => !prev);
@@ -38,7 +30,7 @@ const Todo = ({
   const handleClickUpdate = () => {
     // so if newtitle is the same then dont manipulate state data
     if (newTitle !== title) {
-      handleUpdateTitle(id, newTitle);
+      dispatch?.({ type: 'edit', id, title });
       toggleEditTitle();
     }
   };
@@ -50,14 +42,14 @@ const Todo = ({
       <div className="flex items-center p-2 space-x-4 text-xl text-gray-500">
         <button
           className="hover:text-gray-600 cursor-pointer disabled:text-gray-300 disabled:cursor-not-allowed"
-          onClick={() => handleMoveUp(index)}
+          onClick={() => dispatch?.({ type: 'moveup', index })}
           disabled={index === 0}
         >
           <FaArrowUp />
         </button>
         <button
           className="hover:text-gray-600 cursor-pointer disabled:text-gray-300 disabled:cursor-not-allowed"
-          onClick={() => handleMoveDown(index)}
+          onClick={() => dispatch?.({ type: 'movedown', index })}
           disabled={index === todoLength}
         >
           <FaArrowDown />
@@ -70,7 +62,7 @@ const Todo = ({
             name={id}
             id={id}
             checked={isDone}
-            onChange={() => handleToggleIsDone(id)}
+            onChange={() => dispatch?.({ type: 'completed', id })}
             className="text-5xl"
           />
           {canEditTitle ? (
@@ -118,7 +110,7 @@ const Todo = ({
           <div className="flex items-center space-x-2">
             <MdDeleteOutline
               className="text-red-500 text-2xl cursor-pointer"
-              onClick={() => handleDeleteTodo(id)}
+              onClick={() => dispatch?.({ type: 'delete', id })}
             />
             <BiSolidEdit
               className="text-blue-500 text-2xl cursor-pointer"

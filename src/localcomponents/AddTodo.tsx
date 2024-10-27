@@ -1,13 +1,14 @@
 import { TTodo } from '@/api/api';
-import { useState } from 'react';
+import { TodoDispatchContext } from '@/context';
+import { useContext, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { uid } from 'uid';
-type TAddTodoProp = {
-  handleAddTodo: (todo: TTodo) => void;
-};
-const AddTodo = ({ handleAddTodo }: TAddTodoProp) => {
+
+const AddTodo = () => {
   const [title, setTitle] = useState('');
   const canAddTodo = Boolean(title);
+
+  const dispatch = useContext(TodoDispatchContext);
 
   return (
     <div className="py-4 flex items-center mx-auto">
@@ -22,7 +23,10 @@ const AddTodo = ({ handleAddTodo }: TAddTodoProp) => {
         disabled={!canAddTodo}
         className={`py-2 px-4 disabled:bg-indigo-300 disabled:cursor-not-allowed disabled:hover:bg-none bg-indigo-500 hover:bg-indigo-600 text-white flex items-center space-x-2`}
         onClick={() => {
-          handleAddTodo({ title, isDone: false, id: uid() });
+          dispatch?.({
+            type: 'add',
+            todo: { title, isDone: false, id: uid() },
+          });
           return setTitle('');
         }}
       >
